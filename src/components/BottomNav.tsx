@@ -1,0 +1,50 @@
+import { Heart, Clock, Settings, LayoutDashboard } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
+
+const BottomNav = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { role } = useAuth();
+  const { t } = useLanguage();
+
+  const isElder = role === "elder";
+
+  const elderTabs = [
+    { path: "/", icon: Heart, label: t("checkin") },
+    { path: "/history", icon: Clock, label: t("history") },
+    { path: "/settings", icon: Settings, label: t("settings") },
+  ];
+
+  const caregiverTabs = [
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/settings", icon: Settings, label: "Settings" },
+  ];
+
+  const tabs = isElder ? elderTabs : caregiverTabs;
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 pb-6 pt-2 z-50">
+      <div className="flex justify-around max-w-md mx-auto">
+        {tabs.map((tab) => {
+          const isActive = location.pathname === tab.path;
+          return (
+            <button
+              key={tab.path}
+              onClick={() => navigate(tab.path)}
+              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors ${
+                isActive ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <tab.icon className="w-7 h-7" strokeWidth={isActive ? 2.5 : 2} />
+              <span className="text-sm font-semibold">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};
+
+export default BottomNav;
